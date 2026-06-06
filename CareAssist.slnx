@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="CareAssist.Api/CareAssist.Api.csproj" />
+  </Folder>
+</Solution>
