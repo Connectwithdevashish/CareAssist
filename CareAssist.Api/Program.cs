@@ -1,4 +1,5 @@
 using CareAssist.Api.Data;
+using CareAssist.Api.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

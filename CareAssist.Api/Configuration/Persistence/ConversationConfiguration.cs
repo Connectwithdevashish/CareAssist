@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CareAssist.Api.Configuration.Persistence;
 
-public class ConversationConfiguration : IEntityTypeConfiguration<Conversation>
+public sealed class ConversationConfiguration : IEntityTypeConfiguration<Conversation>
 {
-    public sealed void Configure(EntityTypeBuilder<Conversation> builder)
+    public void Configure(EntityTypeBuilder<Conversation> builder)
     {
         builder.HasKey(x => x.Id);
 
