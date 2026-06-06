@@ -1,6 +1,6 @@
 ﻿namespace CareAssist.Api.Entities.Enum;
 
-public class MessageRole
+public enum MessageRole
 {
     User = 1,
     Assistant = 2,

@@ -19,9 +19,7 @@
 
   <ItemGroup>
     <Folder Include="Controllers\" />
-    <Folder Include="Data\" />
     <Folder Include="Contracts\" />
-    <Folder Include="Configuration\" />
     <Folder Include="Extensions\" />
     <Folder Include="Services\" />
   </ItemGroup>
