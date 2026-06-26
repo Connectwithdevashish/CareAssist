@@ -1,5 +1,7 @@
 using CareAssist.Api.Data;
 using CareAssist.Api.Entities.Identity;
+using CareAssist.Api.Extensions;
+using CareAssist.Api.Services.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerDocumentation();
 
 builder.Services.AddDbContext<ApplicationDbContext>(
     option => option.UseSqlServer(
@@ -18,6 +20,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+
+builder.Services.AddJwtAuthentication(
+    builder.Configuration);
 
 var app = builder.Build();
 
@@ -29,6 +36,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
