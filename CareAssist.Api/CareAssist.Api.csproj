@@ -27,4 +27,10 @@
     <PackageReference Include="Microsoft.OpenApi" Version="2.7.5" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CareAssist.Application\CareAssist.Application.csproj" />
+    <ProjectReference Include="..\CareAssist.Contracts\CareAssist.Contracts.csproj" />
+    <ProjectReference Include="..\CareAssist.Infrastructure\CareAssist.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

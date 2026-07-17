@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CareAssist.Contracts\CareAssist.Contracts.csproj" />
+    <ProjectReference Include="..\CareAssist.Domain\CareAssist.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
