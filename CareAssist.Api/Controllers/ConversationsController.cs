@@ -1,4 +1,5 @@
 ﻿using CareAssist.Api.Contracts.Conversations;
+using CareAssist.Api.Contracts.Messages;
 using CareAssist.Api.Data;
 using CareAssist.Api.Entities.Chat;
 using CareAssist.Api.Extensions;
@@ -14,9 +15,13 @@ namespace CareAssist.Api.Controllers;
 public sealed class ConversationsController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
-    public ConversationsController(ApplicationDbContext context)
+    private readonly ILogger<ConversationsController> _logger;
+
+    public ConversationsController(ApplicationDbContext context, 
+        ILogger<ConversationsController> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     //POST   /api/conversations
@@ -28,13 +33,16 @@ public sealed class ConversationsController : ControllerBase
         Conversation conversation = new Conversation()
         {
             CreatedAtUtc = DateTime.UtcNow,
-            Title = request.Title,
+            Title = string.IsNullOrEmpty(request.Title) ? "New Chat" : request.Title,
             Id = Guid.NewGuid(),
             UserId = userId
         };
 
         _context.Conversations.Add(conversation);
         await _context.SaveChangesAsync();
+
+        _logger.LogInformation("Created new conversation with ID {ConversationId} for user {UserId}",
+            conversation.Id, userId);
 
         ConversationResponse response = new ConversationResponse(
             conversation.Id,
@@ -58,11 +66,14 @@ public sealed class ConversationsController : ControllerBase
         List<ConversationResponse> conversations = await _context.Conversations
             .AsNoTracking()
             .Where(x => x.UserId == userId)
+            .OrderByDescending(x => x.CreatedAtUtc)
             .Select(x => new ConversationResponse(
                 x.Id,
                 x.Title,
                 x.CreatedAtUtc
             )).ToListAsync();
+
+        _logger.LogInformation("Retrieved {Count} conversations for user {UserId}", conversations.Count, userId);
 
         return Ok(conversations);
     }
@@ -87,6 +98,9 @@ public sealed class ConversationsController : ControllerBase
             return NotFound();
         }
 
+        _logger.LogInformation("Retrieved conversation with ID {ConversationId} for user {UserId}",
+            conversationResponse.Id, userId);
+
         return Ok(conversationResponse);
     }
 
@@ -99,10 +113,52 @@ public sealed class ConversationsController : ControllerBase
         var conversation = await _context.Conversations
             .Where(x => x.UserId == userId && x.Id == id)
             .FirstOrDefaultAsync();
-        
-        _context.Conversations.Remove(conversation!);
+
+        if(conversation == null) {
+            return NotFound();
+        }
+
+        _context.Conversations.Remove(conversation);
         await _context.SaveChangesAsync();
 
+        _logger.LogInformation("Deleted conversation with ID {ConversationId} for user {UserId}",
+            conversation.Id, userId);
+
         return NoContent();
+    }
+
+    // Get all conversations with their details
+
+    [HttpGet("{id:guid}/details")]
+    public async Task<ActionResult<ConversationDetailsResponse>> GetDetail(Guid id,
+        CancellationToken cancellationToken)
+    {
+        var userId = User.GetUserId();
+
+        var converstion = await _context.Conversations
+            .AsNoTracking()
+            .Where(x => x.UserId == userId && x.Id == id)
+            .Select(x => new ConversationDetailsResponse
+            (
+                x.Id,
+                x.Title,
+                x.CreatedAtUtc,
+                x.Messages
+                    .OrderBy(m => m.CreatedAtUtc)
+                    .Select(m => new MessageResponse
+                    (
+                        m.Id,
+                        m.Content,
+                        m.Role.ToString().ToLowerInvariant(),
+                        m.CreatedAtUtc
+                    )).ToList())
+            ).FirstOrDefaultAsync(cancellationToken); 
+
+        if(converstion == null) { return NotFound(); }
+
+        _logger.LogInformation("Retrieved conversation details with ID {ConversationId} for user {UserId}",
+            converstion.Id, userId);
+
+        return Ok(converstion);
     }
 }

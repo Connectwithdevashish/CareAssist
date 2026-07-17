@@ -1,5 +1,12 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="CareAssist.Api/CareAssist.Api.csproj" />
+    <Project Path="CareAssist.Application/CareAssist.Application.csproj" Id="1fbbe94f-ad71-41cb-acd4-0f413298b85c" />
+    <Project Path="CareAssist.Contracts/CareAssist.Contracts.csproj" Id="055db34e-648f-47e1-ab1f-b165b8a8fcc3" />
+    <Project Path="CareAssist.Domain/CareAssist.Domain.csproj" Id="6175e64c-c076-41c0-90de-4b46fe26e6b8" />
+    <Project Path="CareAssist.Infrastructure/CareAssist.Infrastructure.csproj" Id="253e49e8-3b8c-44eb-94f2-b912c785d386" />
+    <Project Path="CareAssist.Python/CareAssist.Python.csproj" Id="b4d664a7-b326-4a95-a133-0dcdfc24c6b3" />
+    <Project Path="CareAssist.Shared/CareAssist.Shared.csproj" Id="473e39de-6f96-4759-9837-0a875116ee57" />
+    <Project Path="CareAssist.Tests/CareAssist.Tests.csproj" Id="1e2fabdd-5a81-4d05-bdcd-74480383d9d2" />
   </Folder>
 </Solution>

@@ -12,9 +12,13 @@ namespace CareAssist.Api.Services.Authentication;
 public class JwtTokenService : IJwtTokenService
 {
     private readonly JwtSettings options;
-    public JwtTokenService(IOptions<JwtSettings> options)
+    private readonly ILogger<JwtTokenService> _logger;
+
+    public JwtTokenService(IOptions<JwtSettings> options, 
+        ILogger<JwtTokenService> logger)
     {
         this.options = options.Value;
+        _logger = logger;
     }
 
     public async Task<TokenResult> GenerateToken(ApplicationUser user)
@@ -43,6 +47,9 @@ public class JwtTokenService : IJwtTokenService
             expires: ExpiresAt,
             signingCredentials: credentials
             );
+
+        _logger.LogInformation("Generated JWT token for user {UserId} with expiration at {ExpiresAt}",
+            user.Id, ExpiresAt);
 
         return new TokenResult(
             AccessToken: new JwtSecurityTokenHandler()
