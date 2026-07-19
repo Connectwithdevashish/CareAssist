@@ -1,13 +1,8 @@
-﻿using CareAssist.Api.Contracts.AI;
-using CareAssist.Api.Contracts.Messages;
-using CareAssist.Api.Data;
-using CareAssist.Api.Entities.Chat;
-using CareAssist.Api.Entities.Enum;
-using CareAssist.Api.Extensions;
-using CareAssist.Api.Services.AI;
+﻿using CareAssist.Domain.Chat;
+using CareAssist.Contracts.Messages;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using CareAssist.Application.Messages;
 
 namespace CareAssist.Api.Controllers;
 
@@ -16,31 +11,14 @@ namespace CareAssist.Api.Controllers;
 [Route("api/conversations/{conversationId:guid}/messages")]
 public sealed class MessagesController : ControllerBase
 {
-    private readonly ApplicationDbContext _dbContext;
-    private readonly IChatCompletionService _chatCompletionService;
+    private readonly IMessageService _messageService;
     private readonly ILogger<MessagesController> _logger;
 
-    public MessagesController(ApplicationDbContext dbContext,
-        IChatCompletionService chatCompletionService, 
+    public MessagesController(IMessageService messageService,
         ILogger<MessagesController> logger)
     {
-        _dbContext = dbContext;
-        _chatCompletionService = chatCompletionService;
+        _messageService = messageService;
         _logger = logger;
-    }
-
-    private async Task<Conversation?> GetConversationAsync(Guid conversationId,
-        CancellationToken cancellationToken)
-    {
-        var userId = User.GetUserId();
-
-        _logger.LogInformation("Retrieving conversation with ID {ConversationId} for user {UserId}", conversationId, userId);
-
-        return await _dbContext.Conversations
-            .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.UserId == userId &&
-            c.Id == conversationId,
-            cancellationToken);
     }
 
     // Post Messages in a conversation
@@ -51,62 +29,12 @@ public sealed class MessagesController : ControllerBase
         CreateMessageRequest request,
         CancellationToken cancellationToken = default)
     {
-        var conversation = await GetConversationAsync(conversationId, cancellationToken);
-
-        if(conversation == null)
+        var response = await _messageService.CreateMessageAsync(conversationId, request, cancellationToken);
+        if (response == null)
         {
             return NotFound();
         }
-
-        var userMessage = new Message
-        {
-            Content = request.Content.Trim(),
-            Role = MessageRole.User,
-            CreatedAtUtc = DateTime.UtcNow,
-            ConversationId = conversation.Id
-        };
-
-        _dbContext.Messages.Add(userMessage);
-
-        await _dbContext.SaveChangesAsync(cancellationToken);
-
-        _logger.LogInformation("User message created with ID {MessageId} in conversation {ConversationId}", 
-            userMessage.Id, conversation.Id);
-
-        var history = await _dbContext.Messages
-            .AsNoTracking()
-            .Where(x => x.ConversationId == conversationId)
-            .OrderBy(x => x.CreatedAtUtc)
-            .Select(x => new ChatMessage(
-                x.Role.ToString().ToLowerInvariant(),
-                x.Content
-            ))
-            .ToListAsync();
-
-        var chatResponse = await _chatCompletionService.GenerateResponseAsync(history, cancellationToken);
-
-        var assistantMessage = new Message
-        {
-            Content = chatResponse.Content,
-            Role = MessageRole.Assistant,
-            CreatedAtUtc = DateTime.UtcNow,
-            ConversationId = conversationId
-        };
-
-        _dbContext.Messages.Add(assistantMessage);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-
-        _logger.LogInformation("Assistant message created with ID {MessageId} in conversation {ConversationId}",
-            assistantMessage.Id, conversation.Id);
-
-        var messageResponse = new MessageResponse(
-            assistantMessage.Id,
-            assistantMessage.Content,
-            assistantMessage.Role.ToString().ToLowerInvariant(),
-            assistantMessage.CreatedAtUtc
-        );
-
-        return Ok(messageResponse);
+        return Ok(response);
     }
 
     // Get all messages for a conversation
@@ -118,28 +46,10 @@ public sealed class MessagesController : ControllerBase
     public async Task<ActionResult<IEnumerable<MessageResponse>>> GetAllMessages(Guid conversationId,
         CancellationToken cancellationToken = default)
     {
-        var conversation = await GetConversationAsync(conversationId, cancellationToken);
-
-        if (conversation == null)
-        {
+        var response = await _messageService.GetAllMessagesAsync(conversationId, cancellationToken);
+        if (response == null) {
             return NotFound();
         }
-
-        var messages = await _dbContext.Messages
-            .AsNoTracking()
-            .Where(x => x.ConversationId == conversation.Id)
-            .OrderBy(x => x.CreatedAtUtc)
-            .Select(x => new MessageResponse(
-                x.Id,
-                x.Content,
-                x.Role.ToString().ToLowerInvariant(),
-                x.CreatedAtUtc
-            ))
-            .ToListAsync(cancellationToken);
-
-        _logger.LogInformation("Retrieved {MessageCount} messages for conversation {ConversationId}", 
-            messages.Count, conversation.Id);
-
-        return Ok(messages);
+        return Ok(response);
     }
 }

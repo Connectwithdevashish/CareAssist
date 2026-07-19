@@ -1,4 +1,4 @@
-﻿using CareAssist.Api.Exceptions;
+﻿using CareAssist.Infrastructure.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CareAssist.Api.Middleware.ExceptionHandling;
