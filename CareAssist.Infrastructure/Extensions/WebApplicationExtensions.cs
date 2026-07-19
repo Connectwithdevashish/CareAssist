@@ -18,14 +18,24 @@ public static class WebApplicationExtensions
 
         try
         {
-            logger.LogInformation("Applying database migrations...");
-
-            var db = scope.ServiceProvider
+            var dbContext = scope.ServiceProvider
                 .GetRequiredService<ApplicationDbContext>();
 
-            await db.Database.MigrateAsync();
+            var pending = await dbContext.Database.GetPendingMigrationsAsync();
 
-            logger.LogInformation("Database is up to date.");
+            if (!pending.Any())
+            {
+                logger.LogInformation("Database is already up to date.");
+                return app;
+            }
+
+            logger.LogInformation(
+                "Applying {Count} pending migrations...",
+                pending.Count());
+
+            await dbContext.Database.MigrateAsync();
+
+            logger.LogInformation("Database migrations applied successfully.");
         }
         catch (Exception ex)
         {
