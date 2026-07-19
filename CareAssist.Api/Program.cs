@@ -16,8 +16,7 @@ try
     {
         configuration.ReadFrom.Configuration(context.Configuration)
         .ReadFrom.Services(service)
-        .Enrich.FromLogContext()
-        .WriteTo.Console();
+        .Enrich.FromLogContext();
     });
 
     // Framework services
