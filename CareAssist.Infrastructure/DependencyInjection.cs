@@ -6,7 +6,7 @@ using CareAssist.Infrastructure.AI.Ollama;
 using CareAssist.Infrastructure.Authentication;
 using CareAssist.Infrastructure.Extensions;
 using CareAssist.Infrastructure.Persistence;
-using CareAssist.Infrastructure.Persistence.ContextFile;
+using CareAssist.Infrastructure.Persistence.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -28,17 +28,18 @@ public static class DependencyInjection
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
+        // Add application services
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<IApplicationContextService>(provider =>
             provider.GetRequiredService<ApplicationDbContext>());
 
+        services.AddHttpContextAccessor();
 
+        // Add Extension methods
         services.AddApplicationHealthChecks();
         services.AddAI(configuration);
         services.AddJwtAuthentication(configuration);
-
-        services.AddHttpContextAccessor();
 
         return services;
     }

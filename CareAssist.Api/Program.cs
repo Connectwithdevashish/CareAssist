@@ -1,16 +1,6 @@
 using CareAssist.Api.Extensions;
 using CareAssist.Application;
-using CareAssist.Application.Abstractions;
-using CareAssist.Application.Abstractions.Authentication;
-using CareAssist.Application.Abstractions.Persistence;
-using CareAssist.Domain.Identity;
 using CareAssist.Infrastructure;
-using CareAssist.Infrastructure.AI.Ollama;
-using CareAssist.Infrastructure.Authentication;
-using CareAssist.Infrastructure.Persistence;
-using CareAssist.Infrastructure.Persistence.ContextFile;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -36,8 +26,6 @@ try
     // Infrastructure services
     builder.Services.AddInfrastructure(
         builder.Configuration);
-
-    
 
     // Application services
     builder.Services.AddApplication();

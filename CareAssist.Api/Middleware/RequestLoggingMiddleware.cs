@@ -1,4 +1,4 @@
-﻿using CareAssist.Infrastructure.Persistence.ContextFile.Extensions;
+﻿using CareAssist.Infrastructure.Persistence.Services.Extensions;
 using System.Diagnostics;
 
 namespace CareAssist.Api.Middleware;

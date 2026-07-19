@@ -11,7 +11,6 @@ public static class DependencyInjection
     {
         services.AddValidation();
 
-
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IConversationService, ConversationService>();
         services.AddScoped<IMessageService, MessageService>();
