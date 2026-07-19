@@ -1,6 +1,7 @@
 using CareAssist.Api.Extensions;
 using CareAssist.Application;
 using CareAssist.Infrastructure;
+using CareAssist.Infrastructure.Extensions;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -22,15 +23,17 @@ try
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerDocumentation();
 
+    // Application services
+    builder.Services.AddApplication();
 
     // Infrastructure services
     builder.Services.AddInfrastructure(
         builder.Configuration);
 
-    // Application services
-    builder.Services.AddApplication();
 
     var app = builder.Build();
+
+    await app.ApplyMigrationsAsync();
 
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())
@@ -40,6 +43,8 @@ try
     }
 
     app.UseInfrastructureMiddleware();
+
+    app.UseSerilogRequestLogging();
 
     app.UseHttpsRedirection();
 
