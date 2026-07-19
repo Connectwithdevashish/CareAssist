@@ -1,8 +1,8 @@
-﻿using CareAssist.Api.Configuration.AI;
-using CareAssist.Application.Abstractions.AI;
+﻿using CareAssist.Application.Abstractions.AI;
 using CareAssist.Contracts.AI;
 using CareAssist.Infrastructure.AI.Ollama.Contracts;
 using CareAssist.Infrastructure.AI.Ollama.Mapping;
+using CareAssist.Infrastructure.Configuration.AI;
 using CareAssist.Infrastructure.Exceptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

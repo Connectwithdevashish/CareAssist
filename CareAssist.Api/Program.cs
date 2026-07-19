@@ -4,9 +4,9 @@ using CareAssist.Application.Abstractions;
 using CareAssist.Application.Abstractions.Authentication;
 using CareAssist.Application.Abstractions.Persistence;
 using CareAssist.Domain.Identity;
+using CareAssist.Infrastructure;
 using CareAssist.Infrastructure.AI.Ollama;
 using CareAssist.Infrastructure.Authentication;
-using CareAssist.Infrastructure.Extensions;
 using CareAssist.Infrastructure.Persistence;
 using CareAssist.Infrastructure.Persistence.ContextFile;
 using Microsoft.AspNetCore.Identity;
@@ -27,9 +27,6 @@ try
         .ReadFrom.Services(service);
     });
 
-    // Health checkup
-    builder.Services.AddApplicationHealthChecks();
-
     // Framework services
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
@@ -37,29 +34,13 @@ try
 
 
     // Infrastructure services
-    builder.Services.AddDbContext<ApplicationDbContext>(
-        option => option.UseSqlServer(
-            builder.Configuration.GetConnectionString("DefaultConnection")));
-
-
-    // Identity and security services
-    builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-        .AddEntityFrameworkStores<ApplicationDbContext>()
-        .AddDefaultTokenProviders();
-
-    builder.Services.AddJwtAuthentication(
+    builder.Services.AddInfrastructure(
         builder.Configuration);
 
+    
 
     // Application services
-    builder.Services.AddValidation();
-    builder.Services.AddAI(builder.Configuration);
-    builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
     builder.Services.AddApplication();
-    builder.Services.AddScoped<IApplicationContextService>(provider =>
-        provider.GetRequiredService<ApplicationDbContext>());
-    builder.Services.AddHttpContextAccessor();
-    builder.Services.AddScoped<ICurrentUserService, HttpContextServiceFile>();
 
     var app = builder.Build();
 

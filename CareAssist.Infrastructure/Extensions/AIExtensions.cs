@@ -1,6 +1,5 @@
-﻿using CareAssist.Api.Configuration.AI;
+﻿using CareAssist.Infrastructure.Configuration.AI;
 using CareAssist.Application.Abstractions.AI;
-using CareAssist.Infrastructure.AI;
 using CareAssist.Infrastructure.AI.Fake;
 using CareAssist.Infrastructure.AI.Ollama;
 using CareAssist.Infrastructure.AI.Providers;

@@ -3,7 +3,7 @@ using FluentValidation.AspNetCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
-namespace CareAssist.Api.Extensions;
+namespace CareAssist.Application.Extensions;
 
 public static class ValidationExtensions
 {

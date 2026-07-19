@@ -1,4 +1,4 @@
-﻿namespace CareAssist.Api.Configuration.AI;
+﻿namespace CareAssist.Infrastructure.Configuration.AI;
 
 public sealed class AIOptions
 {
