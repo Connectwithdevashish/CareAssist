@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace CareAssist.Infrastructure.Persistence.ContextFile.Extensions;
+namespace CareAssist.Infrastructure.Persistence.Services.Extensions;
 
 public static class ClaimsPrincipalExtensions
 {

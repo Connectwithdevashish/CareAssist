@@ -1,11 +1,11 @@
-﻿using CareAssist.Api.Configuration.Authentication;
+﻿using CareAssist.Infrastructure.Configuration.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-namespace CareAssist.Api.Extensions;
+namespace CareAssist.Infrastructure.Extensions;
 
 public static class AuthenticationExtensions
 {

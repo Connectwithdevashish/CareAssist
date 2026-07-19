@@ -1,4 +1,4 @@
-﻿namespace CareAssist.Api.Configuration.Authentication;
+﻿namespace CareAssist.Infrastructure.Configuration.Authentication;
 
 public sealed class JwtSettings
 {

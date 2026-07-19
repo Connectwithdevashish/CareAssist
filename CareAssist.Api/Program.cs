@@ -1,16 +1,7 @@
 using CareAssist.Api.Extensions;
 using CareAssist.Application;
-using CareAssist.Application.Abstractions;
-using CareAssist.Application.Abstractions.Authentication;
-using CareAssist.Application.Abstractions.Persistence;
-using CareAssist.Domain.Identity;
-using CareAssist.Infrastructure.AI.Ollama;
-using CareAssist.Infrastructure.Authentication;
+using CareAssist.Infrastructure;
 using CareAssist.Infrastructure.Extensions;
-using CareAssist.Infrastructure.Persistence;
-using CareAssist.Infrastructure.Persistence.ContextFile;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -24,64 +15,57 @@ try
     builder.Host.UseSerilog((context, service, configuration) =>
     {
         configuration.ReadFrom.Configuration(context.Configuration)
-        .ReadFrom.Services(service);
+        .ReadFrom.Services(service)
+        .Enrich.FromLogContext();
     });
-
-    // Health checkup
-    builder.Services.AddApplicationHealthChecks();
 
     // Framework services
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerDocumentation();
 
+    // Application services
+    builder.Services.AddApplication();
 
     // Infrastructure services
-    builder.Services.AddDbContext<ApplicationDbContext>(
-        option => option.UseSqlServer(
-            builder.Configuration.GetConnectionString("DefaultConnection")));
-
-
-    // Identity and security services
-    builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-        .AddEntityFrameworkStores<ApplicationDbContext>()
-        .AddDefaultTokenProviders();
-
-    builder.Services.AddJwtAuthentication(
+    builder.Services.AddInfrastructure(
         builder.Configuration);
 
-
-    // Application services
-    builder.Services.AddValidation();
-    builder.Services.AddAI(builder.Configuration);
-    builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
-    builder.Services.AddApplication();
-    builder.Services.AddScoped<IApplicationContextService>(provider =>
-        provider.GetRequiredService<ApplicationDbContext>());
-    builder.Services.AddHttpContextAccessor();
-    builder.Services.AddScoped<ICurrentUserService, HttpContextServiceFile>();
-
+    Log.Information("Before Build");
     var app = builder.Build();
 
-    // Configure the HTTP request pipeline.
+    Log.Information("Before ApplyMigrationsAsync");
+    await app.ApplyMigrationsAsync();
+
+    // Configure the HTTP request pipeline
+    Log.Information("Before UseSwagger");
     if (app.Environment.IsDevelopment())
     {
         app.UseSwagger();
         app.UseSwaggerUI();
     }
 
+    Log.Information("Before UseInfrastructureMiddleware");
     app.UseInfrastructureMiddleware();
+
+    Log.Information("Before UseSerilogRequestLogging");
+    app.UseSerilogRequestLogging();
 
     app.UseHttpsRedirection();
 
+    Log.Information("Before UseAuthentication");
     app.UseAuthentication();
 
+    Log.Information("Before UseAuthorization");
     app.UseAuthorization();
 
+    Log.Information("Before MapControllers");
     app.MapControllers();
 
+    Log.Information("Before MapHealthChecks");
     app.MapHealthChecks("/health");
 
+    Log.Information("Before Run");
     app.Run();
 
 }

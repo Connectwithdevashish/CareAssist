@@ -1,8 +1,8 @@
 ﻿using CareAssist.Application.Abstractions;
-using CareAssist.Infrastructure.Persistence.ContextFile.Extensions;
+using CareAssist.Infrastructure.Persistence.Services.Extensions;
 using Microsoft.AspNetCore.Http;
 
-namespace CareAssist.Infrastructure.Persistence.ContextFile;
+namespace CareAssist.Infrastructure.Persistence.Services;
 
 public class CurrentUserService : ICurrentUserService
 {

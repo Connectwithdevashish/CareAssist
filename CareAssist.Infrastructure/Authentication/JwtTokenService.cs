@@ -1,7 +1,7 @@
-﻿using CareAssist.Api.Configuration.Authentication;
-using CareAssist.Application.Abstractions.Authentication;
+﻿using CareAssist.Application.Abstractions.Authentication;
 using CareAssist.Contracts.Auth;
 using CareAssist.Domain.Identity;
+using CareAssist.Infrastructure.Configuration.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
