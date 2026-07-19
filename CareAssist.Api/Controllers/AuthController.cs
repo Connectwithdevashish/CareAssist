@@ -1,10 +1,7 @@
-﻿using CareAssist.Api.Contracts.Auth;
-using CareAssist.Api.Entities.Identity;
-using CareAssist.Api.Services.Authentication;
+﻿using CareAssist.Contracts.Auth;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using CareAssist.Application.Authentication;
 
 namespace CareAssist.Api.Controllers;
 
@@ -12,16 +9,13 @@ namespace CareAssist.Api.Controllers;
 [Route("api/auth")]
 public sealed class AuthController : ControllerBase
 {
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly IJwtTokenService _jwtTokenService;
+    private readonly IAuthenticationService _authenticationService;
     private readonly ILogger<AuthController> _logger;
 
-    public AuthController(UserManager<ApplicationUser> userManager, 
-        IJwtTokenService jwtTokenService, 
+    public AuthController(IAuthenticationService authenticationService, 
         ILogger<AuthController> logger)
     {
-        _userManager = userManager;
-        _jwtTokenService = jwtTokenService;
+        _authenticationService = authenticationService;
         _logger = logger;
     }
 
@@ -30,66 +24,21 @@ public sealed class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> RegisterUser(RegisterRequest request)
     {
-        var existingUser = await _userManager.FindByEmailAsync(request.Email);
+        await _authenticationService.RegisterUserAsync(request);
 
-        if (existingUser != null)
-        {
-            _logger.LogWarning("Attempt to register with an existing email: {Email}",
-                request.Email);
-
-            return BadRequest("User with this email already exists.");
-        }
-
-        var result = await _userManager.CreateAsync(new ApplicationUser 
-        {
-            Email = request.Email,
-            UserName = request.Email,
-            CreatedAtUtc = DateTime.UtcNow,
-            IsActive = true
-        }, request.Password);
-
-        if (!result.Succeeded)
-        {
-            _logger.LogError("User creation failed for email: {Email}. Errors: {Errors}", 
-                request.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
-
-            return BadRequest("Failed to create user.");
-        }
-        
-        _logger.LogInformation("User created successfully.");
-
-        return Ok(result);
-
+        return Ok();
     }
 
     [HttpPost("login")]
     public async Task<ActionResult<AuthResponse>> LoginUser(LoginRequest request)
     {
-        var user = await _userManager.FindByEmailAsync(request.Email);
+        var authResponse = await _authenticationService.LoginUserAsync(request);
 
-        if (user == null) {
-            _logger.LogWarning("Failed login attempt for email: {Email}", request.Email);
-
-            return BadRequest("Invalid email or password.");
-        }
-
-        var passwordValidated = await _userManager.CheckPasswordAsync(user, request.Password);
-
-        if (!passwordValidated)
+        if (authResponse == null)
         {
-            _logger.LogWarning("Failed login attempt for email: {Email}", request.Email);
-
-            return BadRequest("Invalid email or password.");
+            return Unauthorized(new { message = "Invalid email or password." });
         }
-
-        var token = await _jwtTokenService.GenerateToken(user);
-
-        _logger.LogInformation("User logged in successfully.");
-
-        return Ok(new AuthResponse(
-            token.AccessToken,
-            token.ExpiresAt
-        ));
+        return Ok(authResponse);
     }
 
     [Authorize]

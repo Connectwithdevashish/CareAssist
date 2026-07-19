@@ -7,7 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="Persistence\ContextFile\CurrentUserService.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.8" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CareAssist.Application\CareAssist.Application.csproj" />
+    <ProjectReference Include="..\CareAssist.Contracts\CareAssist.Contracts.csproj" />
     <ProjectReference Include="..\CareAssist.Domain\CareAssist.Domain.csproj" />
   </ItemGroup>
 

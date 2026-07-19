@@ -1,4 +1,4 @@
-﻿using CareAssist.Api.Exceptions;
+﻿using CareAssist.Infrastructure.Exceptions;
 using System.Net;
 
 namespace CareAssist.Api.Middleware.ExceptionHandling;

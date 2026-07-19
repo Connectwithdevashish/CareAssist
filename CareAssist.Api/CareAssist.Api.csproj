@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentValidation" Version="12.1.1" />
-    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.8">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -29,7 +25,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CareAssist.Application\CareAssist.Application.csproj" />
-    <ProjectReference Include="..\CareAssist.Contracts\CareAssist.Contracts.csproj" />
     <ProjectReference Include="..\CareAssist.Infrastructure\CareAssist.Infrastructure.csproj" />
   </ItemGroup>
 
